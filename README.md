@@ -22,7 +22,4 @@ optionally run with cluster mode and superivise
 
 better to pick an ip than localhost 
 
-dse spark-submit --deploy-mode cluster --supervise --master
-spark://10.200.178.67:7077 --class
-com.datastax.powertools.analytics.SimpleSparkStreaming
-http//:10.200.178.70:8000/SimpleSparkStreaming-0.1.jar 10.200.178.67 9999
+    dse spark-submit --deploy-mode cluster --supervise --class com.datastax.powertools.analytics.SimpleSparkStreaming http://10.200.178.70:8000/SimpleSparkStreaming-0.1.jar 10.200.178.67 9999
