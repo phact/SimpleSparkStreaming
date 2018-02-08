@@ -1,0 +1,12 @@
+# ebdse -v run type=tcpserver yaml=simple tags=phase:main host=locahost
+tags:
+  phase: main
+statement:
+  - statement: |
+      {machine_id}, {sensor_name}, {time}, {sensor_value}, {station_id}
+    bindings:
+      machine_id: compose Mod(<<sources:1000>>); ToHashedUUID() -> UUID
+      sensor_name: HashedLineToString(data/variable_words.txt)
+      time: ToDate()
+      sensor_value: compose normal(0.0,5.0); Add(100.0) -> double
+      station_id: compose Mod(<<stations:100>>); ToHashedUUID() -> UUID
