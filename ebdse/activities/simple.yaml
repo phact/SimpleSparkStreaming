@@ -1,4 +1,4 @@
-# ebdse -v run type=tcpserver yaml=simple tags=phase:main host=locahost
+# ebdse -v run type=tcpserver yaml=simple tags=phase:main port=9999 cycles=100000000 threads=1 targetrate=2000
 tags:
   phase: main
 statement:
