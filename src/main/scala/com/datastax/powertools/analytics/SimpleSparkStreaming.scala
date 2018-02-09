@@ -33,6 +33,10 @@ object SimpleSparkStreaming {
     val sc = SparkContext.getOrCreate(conf)
 
 
+    var seconds = 1
+    if (args.length > 2){
+      seconds = args(2).toInt
+    }
     // Create the context with a 1 second batch size
     val ssc = new StreamingContext(sc, Seconds(seconds))
 
@@ -42,10 +46,6 @@ object SimpleSparkStreaming {
     // Replication necessary in distributed scenario for fault tolerance.
     val lines = ssc.socketTextStream(args(0), args(1).toInt, StorageLevel.MEMORY_AND_DISK_SER)
 
-    var seconds = 1
-    if (args.length > 2){
-      seconds = args(2).toInt
-    }
     val words = lines.flatMap(_.split(" "))
     val wordCounts = words.map(x => (x, 1)).reduceByKey(_ + _)
 
