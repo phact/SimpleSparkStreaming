@@ -5,7 +5,7 @@ set -x
 lsof -i:9999| grep java | awk '{print $2}'| xargs kill
 
 THREADS=1
-TARGETRATE=1000
+TARGETRATE=100
 PORT=9999
 CYCLES=100000000
 

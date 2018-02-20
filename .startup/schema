@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -x
+
+cqlsh -e "
+CREATE KEYSPACE wordcount WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
+
+CREATE TABLE if not exists wordcount.wordcount (
+    word text,
+    time bigint,
+    count int,
+    PRIMARY KEY ((word, time))
+);
+
+CREATE TABLE if not exists wordcount.rollups (
+    word text PRIMARY KEY,
+    count int
+);
+
+TRUNCATE TABLE wordcount.wordcount;
+TRUNCATE TABLE wordcount.rollups;
+"

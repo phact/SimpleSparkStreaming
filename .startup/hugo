@@ -28,6 +28,6 @@ git submodule sync
 
 rm -rf docsrc/public
 
-sudo kill $(lsof -i:1313 | awk '{print $2}'| grep -v PID)
+lsof -i:1313 | grep hugo |  awk '{print $2}'| xargs kill -9
 
 cd docsrc && nohup hugo serve --bind 0.0.0.0 --appendPort --baseUrl "http://${IP}/" &
