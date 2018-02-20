@@ -8,7 +8,7 @@ baseUrl = "/"
 disableKinds = ["taxonomy","taxonomyTerm"]
 
 [params]
-	description = "Asset Name"
+	description = "Simple Spark Streaming"
 
 	logo = "images/asset-hub.svg"
 	favicon = "/images/asset-hub.png"
@@ -29,7 +29,7 @@ disableKinds = ["taxonomy","taxonomyTerm"]
 
 
 [[menu.main]]
-	name   = "Asset Name"
+	name   = "Simple Spark Streaming"
 	url    = "/"
 	weight = 10
 [[menu.main]]

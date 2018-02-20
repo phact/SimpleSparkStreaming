@@ -1,9 +1,9 @@
 ---
-date: 2017-09-07T22:35:05-04:00
 title: Sample
+weight: 20
 menu:
   main:
-      parent: Sample 
+      parent: Sample
       identifier: sample
       weight: 201
 ---
