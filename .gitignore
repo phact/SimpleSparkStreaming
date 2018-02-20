@@ -1,3 +1,5 @@
 *.iml
 .idea/
 target
+nohup.out
+dependency-reduced-pom.xml
