@@ -24,10 +24,12 @@ import org.apache.spark.sql.cassandra._
 object SimpleSparkStreaming {
 
   def main(args: Array[String]) {
-    if (args.length < 2) {
-      System.err.println("Usage: SimpleSparkStreaming <hostname> <port> <seconds>")
+    if (args.length < 3) {
+      System.err.println("Usage: SimpleSparkStreaming <hostname> <port> <seconds> <persist>")
       System.exit(1)
     }
+
+    val persist = args(3).toBoolean
 
     val conf = new SparkConf().setAppName("SimpleSparkStreaming")
     val sc = SparkContext.getOrCreate(conf)
@@ -37,6 +39,7 @@ object SimpleSparkStreaming {
     if (args.length > 2){
       seconds = args(2).toInt
     }
+
     // Create the context with a 1 second batch size
     val ssc = new StreamingContext(sc, Seconds(seconds))
 
@@ -49,14 +52,16 @@ object SimpleSparkStreaming {
     val words = lines.flatMap(_.split(" "))
     val wordCounts = words.map(x => (x, 1)).reduceByKey(_ + _)
 
-    wordCounts.foreachRDD{ (rdd : RDD[(String , Int)], time: org.apache.spark.streaming.Time) =>
+    wordCounts.foreachRDD { (rdd: RDD[(String, Int)], time: org.apache.spark.streaming.Time) =>
 
       val spark = SparkSessionSingleton.getInstance(rdd.sparkContext.getConf)
       import spark.implicits._
 
-      val wordCountsDS= rdd.map((r:(String, Int)) => WordCount(r._1, r._2)).toDS()
+      val wordCountsDS = rdd.map((r: (String, Int)) => WordCount(r._1, r._2)).toDS()
       wordCountsDS.show()
-      wordCountsDS.write.cassandraFormat("wordcount", "wordcount").mode(SaveMode.Append).save
+      if (persist) {
+        wordCountsDS.write.cassandraFormat("wordcount", "wordcount").mode(SaveMode.Append).save
+      }
     }
 
     ssc.start()
