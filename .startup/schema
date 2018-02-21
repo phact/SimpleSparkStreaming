@@ -2,8 +2,23 @@
 
 set -x
 
+RF=3
+IP=$(ifconfig | awk '/inet/ { print $2 }' | egrep -v '^fe|^127|^192|^172|::' | head -1)
+IP=${IP#addr:}
+
+if [[ $HOSTNAME == "node"* ]] ; then
+    #rightscale
+    IP=$(grep $(hostname) /etc/hosts | grep -v ext | awk '{print $1}')
+fi
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Mac OSX
+    IP=localhost
+    RF=1
+fi
+
 cqlsh -e "
-CREATE KEYSPACE if not exists wordcount WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
+CREATE KEYSPACE if not exists wordcount WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '"$RF"'}  AND durable_writes = true;
 
 CREATE TABLE if not exists wordcount.wordcount (
     word text,
@@ -18,5 +33,4 @@ CREATE TABLE if not exists wordcount.rollups (
 );
 
 TRUNCATE TABLE wordcount.wordcount;
-TRUNCATE TABLE wordcount.rollups;
-"
+TRUNCATE TABLE wordcount.rollups;"

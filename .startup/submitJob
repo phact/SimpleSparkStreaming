@@ -4,7 +4,7 @@ IP=${IP#addr:}
 
 if [[ $HOSTNAME == "node"* ]] ; then
     #rightscale
-    IP=$(grep $(hostname)_ext /etc/hosts | awk '{print $1}')
+    IP=$(grep $(hostname) /etc/hosts | grep -v ext | awk '{print $1}')
 fi
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
