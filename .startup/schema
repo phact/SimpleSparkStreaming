@@ -3,7 +3,7 @@
 set -x
 
 cqlsh -e "
-CREATE KEYSPACE wordcount WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
+CREATE KEYSPACE if not exists wordcount WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
 
 CREATE TABLE if not exists wordcount.wordcount (
     word text,

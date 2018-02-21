@@ -4,4 +4,4 @@ ps -ef | grep Streaming-0 | grep -v grep|awk '{print $2}' | xargs kill -9
 
 mvn package
 
-dse spark-submit --class com.datastax.powertools.analytics.SimpleSparkStreaming ./target/SimpleSparkStreaming-0.1.jar localhost 9999 30 true true
+dse spark-submit --class com.datastax.powertools.analytics.SimpleSparkStreaming ./target/SimpleSparkStreaming-0.1.jar localhost 9999 5 true true
