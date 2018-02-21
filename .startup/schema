@@ -17,7 +17,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     RF=1
 fi
 
-cqlsh -e "
+cqlsh "$IP" -e "
 CREATE KEYSPACE if not exists wordcount WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '"$RF"'}  AND durable_writes = true;
 
 CREATE TABLE if not exists wordcount.wordcount (
