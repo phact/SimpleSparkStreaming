@@ -30,6 +30,7 @@ object SimpleSparkStreaming {
 
     val conf = new SparkConf().setAppName("SimpleSparkStreaming")
     conf.set("spark.locality.wait", "0");
+    conf.set("spark.kryoserializer.buffer.mb","24")
 
     val sc = SparkContext.getOrCreate(conf)
 
