@@ -1,5 +1,5 @@
 languageCode = "en-us"
-title = "Simple Streaming Analytics"
+title = "Streaming Analytics Proofshop"
 theme = "hugo-material-docs"
 metadataformat = "yaml"
 canonifyurls = true
@@ -8,7 +8,7 @@ baseUrl = "/"
 disableKinds = ["taxonomy","taxonomyTerm"]
 
 [params]
-	description = "Simple Streaming Analytics"
+	description = "Streaming Analytics Proofshop"
 
 	logo = "images/asset-hub.svg"
 	favicon = "/images/asset-hub.png"
@@ -29,7 +29,7 @@ disableKinds = ["taxonomy","taxonomyTerm"]
 
 
 [[menu.main]]
-	name   = "Simple Streaming Analytics"
+	name   = "Streaming Analytics Proofshop"
 	url    = "/"
 	weight = 10
 [[menu.main]]

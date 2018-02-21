@@ -1,10 +1,10 @@
 ---
-title: Simple Streaming Analytics
+title: Streaming Analytics Proofshop
 type: index
 weight: 10
 ---
 
-This is a guide for how to use the Simple Streaming Analytics Proofshop. The Proofshop consists of demonstrating real time data processing and analytics with the DSE paltform at high throughput, low latency, and scale.
+This is a guide for how to use the Streaming Analytics Proofshop asset brought to you by the Vanguard team. The Proofshop consists of demonstrating real time data processing and analytics with the DSE paltform at high throughput, low latency, and scale.
 
 ### Motivation
 
