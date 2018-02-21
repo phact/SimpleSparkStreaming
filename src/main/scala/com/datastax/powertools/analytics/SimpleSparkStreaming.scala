@@ -58,7 +58,6 @@ object SimpleSparkStreaming {
       import spark.implicits._
 
       val wordCountsDS = rdd.map((r: (String, Int)) => WordCount(r._1, r._2, epochTime)).toDS()
-      wordCountsDS.show()
       if (persist) {
         wordCountsDS.write.cassandraFormat("wordcount", "wordcount").mode(SaveMode.Append).save
       }
