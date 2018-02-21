@@ -1,13 +1,10 @@
 ---
-title: Simple Streaming
+title: Simple Streaming Analytics
 type: index
-weight: 0
+weight: 10
 ---
 
-Simple Streaming
-===================
-
-This is a guide for how to use the Simple Spark Streaming Proofshop. The Proofshop consists of demonstrating real time data processing and analytics with the DSE paltform at high throughput, low latency, and scale.
+This is a guide for how to use the Simple Streaming Analytics Proofshop. The Proofshop consists of demonstrating real time data processing and analytics with the DSE paltform at high throughput, low latency, and scale.
 
 ### Motivation
 
