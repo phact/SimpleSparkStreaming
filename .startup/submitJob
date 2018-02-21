@@ -1,7 +1,19 @@
 #!/bin/bash
+IP=$(ifconfig | awk '/inet/ { print $2 }' | egrep -v '^fe|^127|^192|^172|::' | head -1)
+IP=${IP#addr:}
+
+if [[ $HOSTNAME == "node"* ]] ; then
+    #rightscale
+    IP=$(grep $(hostname)_ext /etc/hosts | awk '{print $1}')
+fi
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Mac OSX
+    IP=localhost
+fi
 
 ps -ef | grep Streaming-0 | grep -v grep|awk '{print $2}' | xargs kill -9
 
 mvn package
 
-dse spark-submit --class com.datastax.powertools.analytics.SimpleSparkStreaming ./target/SimpleSparkStreaming-0.1.jar localhost 9999 5 true true
+dse spark-submit --class com.datastax.powertools.analytics.SimpleSparkStreaming ./target/SimpleSparkStreaming-0.1.jar "$IP" 9999 5 true true
