@@ -29,7 +29,8 @@ object SimpleSparkStreaming {
     val aggregate = args(4).toBoolean
 
     val conf = new SparkConf().setAppName("SimpleSparkStreaming")
-    conf.set("spark.");
+    conf.set("spark.locality.wait", "0");
+
     val sc = SparkContext.getOrCreate(conf)
 
 
