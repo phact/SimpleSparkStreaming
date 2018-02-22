@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory
 
 // For DSE it is not necessary to set connection parameters for spark.master (since it will be done
 // automatically)
-
 object SimpleSparkStreaming {
 
   def main(args: Array[String]) {
@@ -48,31 +47,37 @@ object SimpleSparkStreaming {
     val sc = SparkContext.getOrCreate(conf)
 
 
+    //default
     var seconds = 1
     if (args.length > 2) {
+      //argument
       seconds = args(2).toInt
     }
+    val host = args(0)
+    val port = args(1).toInt
 
-    // Create the context with a 1 second batch size
+    // Create the context with the window size
     val ssc = new StreamingContext(sc, Seconds(seconds))
+
     if (aggregate) {
+      //because of updateStateByKey, this is full data checkpointing not just metadata.
       ssc.checkpoint("dsefs:///checkpoint")
     }
 
-    val lines = ssc.socketTextStream(args(0), args(1).toInt, StorageLevel.MEMORY_AND_DISK_SER)
+    //for a queue use queue specific connector
+    val lines = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER)
 
-    val words = lines.flatMap(_.split(",")).map(x => (x.trim(), 1))
-    val wordCounts = words.reduceByKey(_ + _)
+    //go from event to tuples (event, 1)
+    val words = lines.map(x => (x, 1))
 
-    wordCounts.foreachRDD { (rdd: RDD[(String, Int)], time: org.apache.spark.streaming.Time) =>
-      //Log.setLogger(new MyLogger())
-      //Log.TRACE()
+    words.foreachRDD { (rdd: RDD[(String, Int)], time: org.apache.spark.streaming.Time) =>
       val epochTime: Long = time.milliseconds
 
-
+      //WordCount is a Case Class that maps to the DSE table
       val wordCountsRDD = rdd.map((r: (String, Int)) => WordCount(r._1, r._2, epochTime))
-      print(wordCountsRDD.take(10))
+
       if (persist) {
+        //write to the database in each microbatch
         wordCountsRDD.saveToCassandra("wordcount", "wordcount")
       }
     }
@@ -88,7 +93,8 @@ object SimpleSparkStreaming {
       stateCount.foreachRDD { (rdd: RDD[Row], time: org.apache.spark.streaming.Time) =>
 
         val wordCountsRDD = rdd.map((r: (Row)) => WordCountAggregate(r.getAs[String](0), r.getAs[Int](1)))
-        print(wordCountsRDD.take(10))
+
+        //write to the database in each microbatch
         wordCountsRDD.saveToCassandra("wordcount", "rollups")
       }
     }
@@ -100,38 +106,14 @@ object SimpleSparkStreaming {
 // scalastyle:on println
 
 
+//case classes are used to map the data to DSE tables
 case class WordCount(word: String, count: Long, time: Long)
 case class WordCountAggregate(word: String, count: Long)
 
+//because we are checkpointing the data into DSEFS, we need to register the case classes with kryo
 class MyRegistrator extends KryoRegistrator {
   override def registerClasses(kryo: Kryo) {
     kryo.register(classOf[WordCount])
     kryo.register(classOf[WordCountAggregate])
   }
 }
-
-/*
-/** Lazily instantiated singleton instance of SparkSession */
-object SparkSessionSingleton {
-
-  @transient  private var instance: SparkSession = _
-
-  def getInstance(sparkConf: SparkConf): SparkSession = {
-    if (instance == null) {
-      instance = SparkSession
-        .builder
-        .config(sparkConf)
-        .getOrCreate()
-    }
-    instance
-  }
-}
-
-class MyLogger() extends Logger() {
-  override def log(level:Int, category:String, message:String, ex:Throwable) {
-    var builder = new StringBuilder(256)
-    var factory = LoggerFactory.getLogger("SimpleStreaming")
-    factory.error(message)
-  }
-}
-*/

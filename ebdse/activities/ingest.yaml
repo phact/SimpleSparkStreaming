@@ -5,4 +5,6 @@ bindings:
   date: ToDate()
 tags:
   phase: main
-statement:  insert into wordcount.wordcount (word, date) (?franchise_id, ?date)
+statements:
+ - write: |
+  insert into wordcount.wordcount (word, date) (?franchise_id, ?date)

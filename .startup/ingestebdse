@@ -23,4 +23,4 @@ fi
 
 lsof -i:9999| grep java | awk '{print $2}'| xargs kill -9
 
-cd ebdse && nohup /tmp/ebdse/ebdse -v run type=cql yaml=ingest tags=phase:main cycles="$CYCLES" threads="$THREADS" targetrate="$TARGETRATE" host=$IP &
+cd ebdse && /tmp/ebdse/ebdse -v run type=cql yaml=ingest tags=phase:main cycles="$CYCLES" threads="$THREADS" targetrate="$TARGETRATE" host=$IP 
