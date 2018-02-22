@@ -57,17 +57,14 @@ object SimpleSparkStreaming {
     val wordCounts = words.reduceByKey(_ + _)
 
     wordCounts.foreachRDD { (rdd: RDD[(String, Int)], time: org.apache.spark.streaming.Time) =>
-      Log.setLogger(new MyLogger())
-      Log.TRACE()
+      //Log.setLogger(new MyLogger())
+      //Log.TRACE()
       val epochTime: Long = System.currentTimeMillis / 1000
 
-      val spark = SparkSessionSingleton.getInstance(rdd.sparkContext.getConf)
-      import spark.implicits._
 
-      val wordCountsDS = rdd.map((r: (String, Int)) => WordCount(r._1, r._2, epochTime)).toDS()
-      wordCountsDS.show()
+      val wordCountsRDD = rdd.map((r: (String, Int)) => WordCount(r._1, r._2, epochTime))
       if (persist) {
-        wordCountsDS.write.cassandraFormat("wordcount", "wordcount").mode(SaveMode.Append).save
+        wordCountsRDD.saveToCassandra("wordcount", "wordcount")
       }
     }
 
@@ -80,12 +77,10 @@ object SimpleSparkStreaming {
     if (aggregate) {
 
       stateCount.foreachRDD { (rdd: RDD[Row], time: org.apache.spark.streaming.Time) =>
-        val spark = SparkSessionSingleton.getInstance(rdd.sparkContext.getConf)
-        import spark.implicits._
 
-        val wordCountsDS = rdd.map((r: (Row)) => WordCountAggregate(r.getAs[String](0), r.getAs[Int](1))).toDS()
+        val wordCountsRDD = rdd.map((r: (Row)) => WordCountAggregate(r.getAs[String](0), r.getAs[Int](1)))
         if (persist) {
-          wordCountsDS.write.cassandraFormat("rollups", "wordcount").mode(SaveMode.Append).save
+          wordCountsRDD.saveToCassandra("wordcount", "rollups")
         }
       }
     }
@@ -97,7 +92,9 @@ object SimpleSparkStreaming {
 // scalastyle:on println
 
 
-
+case class WordCount(word: String, count: Long, time: Long)
+case class WordCountAggregate(word: String, count: Long)
+/*
 /** Lazily instantiated singleton instance of SparkSession */
 object SparkSessionSingleton {
 
@@ -113,8 +110,6 @@ object SparkSessionSingleton {
     instance
   }
 }
-case class WordCount(word: String, count: Long, time: Long)
-case class WordCountAggregate(word: String, count: Long)
 
 class MyLogger() extends Logger() {
   override def log(level:Int, category:String, message:String, ex:Throwable) {
@@ -123,3 +118,4 @@ class MyLogger() extends Logger() {
     factory.error(message)
   }
 }
+*/
