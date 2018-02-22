@@ -39,6 +39,8 @@ object SimpleSparkStreaming {
     conf.set("spark.locality.wait", "0");
     conf.set("spark.kryoserializer.buffer","64k")
 
+    System.setProperty("spark.serializer", "spark.KryoSerializer")
+    System.setProperty("spark.kryo.registrator", "com.datastax.powertools.analytics.MyRegistrator")
     val sc = SparkContext.getOrCreate(conf)
 
 
