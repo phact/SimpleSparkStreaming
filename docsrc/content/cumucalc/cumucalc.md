@@ -30,3 +30,39 @@ In DSE we recommend using DSE's very own file system (DSEFS) for this purpose. F
 Compared to an idempotent application, a stateful streaming app will use more system resources and will not be as performant since it needs to keep track of state.
 In addition, note that the streaming app will store, calculate, and persist the state of each key during each window.
 This means that the performance of the streaming job will scale with the size of the total number of keys, not with the amount of data received in a particular window.
+
+Let's take the ebdse yaml used for this asset:
+
+```
+tags:
+  phase: main
+  statement:
+    - statement: |
+        {franchise_id}-{event_name}
+      bindings:
+        franchise_id: compose Mod(<<sources:100>>); ToHashedUUID() -> UUID
+        event_name: compose normal(50, 20); HashedLineToString(data/variable_words.txt); ToString() -> String
+```
+
+Notice that the events that we are generating are a combination of the franchise_id and the event_name.
+In this case, we have 100 franchises and about 73 normally distributed event_names.
+This means that the total number of keys will be about 7300 and this number remains constant for the lifetime of the streaming job.
+
+This yaml results in a stable `updateStateByKey` job because the total number of keys does not increase.
+
+In the case where your keys are unbounded, there are better, idempotent, approaches that can be used to pre-calculate rollups with streaming applications that do not fall into the category of Cumulative Calculations.
+
+For example, the following configuration would result in an unstable Spark application (one that quickly becomes unable to process the data in the time allotted):
+
+```
+tags:
+  phase: main
+  statement:
+    - statement: |
+        {franchise_id}-{event_name}
+      bindings:
+        franchise_id: compose Mod(<<sources:100>>); ToHashedUUID() -> UUID
+        event_name: ToHashedUUID()
+```
+
+In this case the event_name is a UUID derived from the monotonically increasing cycle and it will quickly result in a state that becomes too large and takes too long to persist.

@@ -2,6 +2,11 @@
 
 set -x
 
+THREADS=1
+TARGETRATE=10000
+PORT=9999
+CYCLES=100000000
+
 IP=$(ifconfig | awk '/inet/ { print $2 }' | egrep -v '^fe|^127|^192|^172|::' | head -1)
 IP=${IP#addr:}
 
@@ -13,14 +18,10 @@ fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # Mac OSX
     IP=localhost
+    TARGETRATE=100
 fi
 
 
 lsof -i:9999| grep java | awk '{print $2}'| xargs kill -9
-
-THREADS=1
-TARGETRATE=10000
-PORT=9999
-CYCLES=100000000
 
 cd ebdse && nohup /tmp/ebdse/ebdse -v run type=tcpserver yaml=simple tags=phase:main port="$PORT" cycles="$CYCLES" threads="$THREADS" targetrate="$TARGETRATE" host=$IP &
