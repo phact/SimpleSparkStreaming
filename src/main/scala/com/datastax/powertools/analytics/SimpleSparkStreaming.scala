@@ -3,6 +3,7 @@ package com.datastax.powertools.analytics
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.writer.SqlRowWriter
+import com.esotericsoftware.minlog.Log
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SQLContext, SaveMode, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -20,6 +21,7 @@ import org.apache.spark.sql.cassandra._
 object SimpleSparkStreaming {
 
   def main(args: Array[String]) {
+    Log.TRACE()
     if (args.length < 5) {
       System.err.println("Usage: SimpleSparkStreaming <hostname> <port> <seconds> <persist> <aggregate>")
       System.exit(1)
@@ -30,7 +32,7 @@ object SimpleSparkStreaming {
 
     val conf = new SparkConf().setAppName("SimpleSparkStreaming")
     conf.set("spark.locality.wait", "0");
-    conf.set("spark.kryoserializer.buffer.mb","24")
+    conf.set("spark.kryoserializer.buffer","64k")
 
     val sc = SparkContext.getOrCreate(conf)
 
@@ -52,7 +54,6 @@ object SimpleSparkStreaming {
     val wordCounts = words.reduceByKey(_ + _)
 
     wordCounts.foreachRDD { (rdd: RDD[(String, Int)], time: org.apache.spark.streaming.Time) =>
-
       val epochTime: Long = System.currentTimeMillis / 1000
 
       val spark = SparkSessionSingleton.getInstance(rdd.sparkContext.getConf)
