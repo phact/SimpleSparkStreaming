@@ -63,6 +63,7 @@ object SimpleSparkStreaming {
 
 
       val wordCountsRDD = rdd.map((r: (String, Int)) => WordCount(r._1, r._2, epochTime))
+      print(wordCountsRDD.take(10))
       if (persist) {
         wordCountsRDD.saveToCassandra("wordcount", "wordcount")
       }
@@ -79,9 +80,8 @@ object SimpleSparkStreaming {
       stateCount.foreachRDD { (rdd: RDD[Row], time: org.apache.spark.streaming.Time) =>
 
         val wordCountsRDD = rdd.map((r: (Row)) => WordCountAggregate(r.getAs[String](0), r.getAs[Int](1)))
-        if (persist) {
-          wordCountsRDD.saveToCassandra("wordcount", "rollups")
-        }
+        print(wordCountsRDD.take(10))
+        wordCountsRDD.saveToCassandra("wordcount", "rollups")
       }
     }
 
