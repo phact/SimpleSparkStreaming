@@ -18,19 +18,19 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 cqlsh "$IP" -e "
-CREATE KEYSPACE if not exists wordcount WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '"$RF"'}  AND durable_writes = true;
+CREATE KEYSPACE if not exists streaming WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '"$RF"'}  AND durable_writes = true;
 
-CREATE TABLE if not exists wordcount.wordcount (
+CREATE TABLE if not exists streaming.orders (
     word text,
     time bigint,
     count int,
     PRIMARY KEY ((word, time))
 );
 
-CREATE TABLE if not exists wordcount.rollups (
+CREATE TABLE if not exists streaming.rollups (
     word text PRIMARY KEY,
     count int
 );
 
-TRUNCATE TABLE wordcount.wordcount;
-TRUNCATE TABLE wordcount.rollups;"
+TRUNCATE TABLE streaming.orders;
+TRUNCATE TABLE streaming.rollups;"

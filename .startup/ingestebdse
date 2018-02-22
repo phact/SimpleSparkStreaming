@@ -4,7 +4,7 @@ set -x
 
 THREADS=1
 TARGETRATE=80000
-CYCLES=100000000
+CYCLES=1000000
 
 IP=$(ifconfig | awk '/inet/ { print $2 }' | egrep -v '^fe|^127|^192|^172|::' | head -1)
 IP=${IP#addr:}

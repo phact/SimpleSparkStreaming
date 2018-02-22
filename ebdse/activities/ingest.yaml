@@ -1,10 +1,10 @@
 # ebdse -v run type=cql yaml=simple tags=phase:main port=9999 cycles=100000000 threads=1 targetrate=2000
 bindings:
-  franchise_id: compose Mod(<<sources:100>>); ToHashedUUID() -> UUID
+  franchise_id: compose Mod(<<sources:100>>); ToHashedUUID(); ToString() -> String
   event_name: compose normal(50, 20); HashedLineToString(data/variable_words.txt); ToString() -> String
-  date: ToDate()
+  date: ToLong()
+  one: compose WeightedStrings('1:1'); ToInt() -> Int
 tags:
   phase: main
 statements:
- - write: |
-  insert into wordcount.wordcount (word, date) (?franchise_id, ?date)
+ - "insert into streaming.orders (word, count, time) values (?franchise_id, ?one, ?date)"

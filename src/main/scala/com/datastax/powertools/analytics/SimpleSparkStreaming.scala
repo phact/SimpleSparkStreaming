@@ -65,20 +65,21 @@ object SimpleSparkStreaming {
     }
 
     //for a queue use queue specific connector
-    val lines = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER)
+    val stream = ssc.socketTextStream(host, port, StorageLevel.MEMORY_AND_DISK_SER)
 
     //go from event to tuples (event, 1)
-    val words = lines.map(x => (x, 1))
+    //to further optimize, consider reduceByKey to get counts per microbatch
+    val events = stream.map(x => (x, 1))
 
-    words.foreachRDD { (rdd: RDD[(String, Int)], time: org.apache.spark.streaming.Time) =>
+    events.foreachRDD { (rdd: RDD[(String, Int)], time: org.apache.spark.streaming.Time) =>
       val epochTime: Long = time.milliseconds
 
       //WordCount is a Case Class that maps to the DSE table
-      val wordCountsRDD = rdd.map((r: (String, Int)) => WordCount(r._1, r._2, epochTime))
+      val eventsRDD = rdd.map((r: (String, Int)) => Event(r._1, r._2, epochTime))
 
       if (persist) {
         //write to the database in each microbatch
-        wordCountsRDD.saveToCassandra("wordcount", "wordcount")
+        eventsRDD.saveToCassandra("streaming", "orders")
       }
     }
 
@@ -87,15 +88,15 @@ object SimpleSparkStreaming {
       Some(newCount)
     }
 
-    var stateCount = words.updateStateByKey[Int](updateFunction _).map(x => Row(x._1, x._2))
+    var stateCount = events.updateStateByKey[Int](updateFunction _).map(x => Row(x._1, x._2))
     if (aggregate) {
 
       stateCount.foreachRDD { (rdd: RDD[Row], time: org.apache.spark.streaming.Time) =>
 
-        val wordCountsRDD = rdd.map((r: (Row)) => WordCountAggregate(r.getAs[String](0), r.getAs[Int](1)))
+        val eventCountsRDD = rdd.map((r: (Row)) => EventRollup(r.getAs[String](0), r.getAs[Int](1)))
 
         //write to the database in each microbatch
-        wordCountsRDD.saveToCassandra("wordcount", "rollups")
+        eventCountsRDD.saveToCassandra("streaming", "rollups")
       }
     }
 
@@ -107,13 +108,13 @@ object SimpleSparkStreaming {
 
 
 //case classes are used to map the data to DSE tables
-case class WordCount(word: String, count: Long, time: Long)
-case class WordCountAggregate(word: String, count: Long)
+case class Event(word: String, count: Long, time: Long)
+case class EventRollup(word: String, count: Long)
 
 //because we are checkpointing the data into DSEFS, we need to register the case classes with kryo
 class MyRegistrator extends KryoRegistrator {
   override def registerClasses(kryo: Kryo) {
-    kryo.register(classOf[WordCount])
-    kryo.register(classOf[WordCountAggregate])
+    kryo.register(classOf[Event])
+    kryo.register(classOf[EventRollup])
   }
 }
