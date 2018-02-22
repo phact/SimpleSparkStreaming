@@ -5,5 +5,5 @@ set -x
 echo "stopping everything"
 
 lsof -i:1313 | grep hugo |  awk '{print $2}'| xargs kill -9
-lsof -i:9999| grep java | awk '{print $2}'| xargs kill
+lsof -i:9999| grep java | awk '{print $2}'| xargs kill -9
 ps -ef | grep Streaming-0 | grep -v grep|awk '{print $2}' | xargs kill -9

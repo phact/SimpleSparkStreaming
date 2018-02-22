@@ -1,9 +1,12 @@
 package com.datastax.powertools.analytics
 
+import java.util.Date
+
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.writer.SqlRowWriter
 import com.esotericsoftware.minlog.Log
+import com.esotericsoftware.minlog.Log.Logger
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SQLContext, SaveMode, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -14,6 +17,7 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.cassandra._
+import org.slf4j.LoggerFactory
 
 // For DSE it is not necessary to set connection parameters for spark.master (since it will be done
 // automatically)
@@ -21,7 +25,6 @@ import org.apache.spark.sql.cassandra._
 object SimpleSparkStreaming {
 
   def main(args: Array[String]) {
-    Log.TRACE()
     if (args.length < 5) {
       System.err.println("Usage: SimpleSparkStreaming <hostname> <port> <seconds> <persist> <aggregate>")
       System.exit(1)
@@ -54,6 +57,7 @@ object SimpleSparkStreaming {
     val wordCounts = words.reduceByKey(_ + _)
 
     wordCounts.foreachRDD { (rdd: RDD[(String, Int)], time: org.apache.spark.streaming.Time) =>
+      Log.setLogger(new MyLogger())
       Log.TRACE()
       val epochTime: Long = System.currentTimeMillis / 1000
 
@@ -111,3 +115,11 @@ object SparkSessionSingleton {
 }
 case class WordCount(word: String, count: Long, time: Long)
 case class WordCountAggregate(word: String, count: Long)
+
+class MyLogger() extends Logger() {
+  override def log(level:Int, category:String, message:String, ex:Throwable) {
+    var builder = new StringBuilder(256)
+    var factory = LoggerFactory.getLogger("SimpleStreaming")
+    factory.error(message)
+  }
+}
