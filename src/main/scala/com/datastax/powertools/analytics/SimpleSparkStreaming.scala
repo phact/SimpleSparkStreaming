@@ -5,6 +5,7 @@ import java.util.Date
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.writer.SqlRowWriter
+import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.minlog.Log
 import com.esotericsoftware.minlog.Log.Logger
 import org.apache.spark.rdd.RDD
@@ -16,6 +17,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.serializer.KryoRegistrator
 import org.apache.spark.sql.cassandra._
 import org.slf4j.LoggerFactory
 
@@ -94,6 +96,14 @@ object SimpleSparkStreaming {
 
 case class WordCount(word: String, count: Long, time: Long)
 case class WordCountAggregate(word: String, count: Long)
+
+class MyRegistrator extends KryoRegistrator {
+  override def registerClasses(kryo: Kryo) {
+    kryo.register(classOf[WordCount])
+    kryo.register(classOf[WordCountAggregate])
+  }
+}
+
 /*
 /** Lazily instantiated singleton instance of SparkSession */
 object SparkSessionSingleton {
