@@ -1,0 +1,8 @@
+# ebdse -v run type=cql yaml=simple tags=phase:main port=9999 cycles=100000000 threads=1 targetrate=2000
+bindings:
+  franchise_id: compose Mod(<<sources:100>>); ToHashedUUID() -> UUID
+  event_name: compose normal(50, 20); HashedLineToString(data/variable_words.txt); ToString() -> String
+  date: ToDate()
+tags:
+  phase: main
+statement:  insert into wordcount.wordcount (word, date) (?franchise_id, ?date)
