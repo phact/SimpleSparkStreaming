@@ -59,7 +59,7 @@ object SimpleSparkStreaming {
     wordCounts.foreachRDD { (rdd: RDD[(String, Int)], time: org.apache.spark.streaming.Time) =>
       //Log.setLogger(new MyLogger())
       //Log.TRACE()
-      val epochTime: Long = System.currentTimeMillis / 1000
+      val epochTime: Long = time.milliseconds
 
 
       val wordCountsRDD = rdd.map((r: (String, Int)) => WordCount(r._1, r._2, epochTime))
