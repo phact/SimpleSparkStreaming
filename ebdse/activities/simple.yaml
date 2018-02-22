@@ -1,9 +1,7 @@
 # ebdse -v run type=tcpserver yaml=simple tags=phase:main port=9999 cycles=100000000 threads=1 targetrate=2000
+bindings:
+  franchise_id: compose Mod(<<sources:100>>); ToHashedUUID() -> UUID
+  event_name: compose normal(50, 20); HashedLineToString(data/variable_words.txt); ToString() -> String
 tags:
   phase: main
-statement:
-  - statement: |
-      {franchise_id}-{event_name}
-    bindings:
-      franchise_id: compose Mod(<<sources:100>>); ToHashedUUID() -> UUID
-      event_name: compose normal(50, 20); HashedLineToString(data/variable_words.txt); ToString() -> String
+statement: "{franchise_id}-{event_name}"

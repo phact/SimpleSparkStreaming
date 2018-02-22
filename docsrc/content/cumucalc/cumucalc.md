@@ -34,14 +34,12 @@ This means that the performance of the streaming job will scale with the size of
 Let's take the ebdse yaml used for this asset:
 
 ```
+bindings:
+  franchise_id: compose Mod(<<sources:100>>); ToHashedUUID() -> UUID
+  event_name: compose normal(50, 20); HashedLineToString(data/variable_words.txt); ToString() -> String
 tags:
   phase: main
-  statement:
-    - statement: |
-        {franchise_id}-{event_name}
-      bindings:
-        franchise_id: compose Mod(<<sources:100>>); ToHashedUUID() -> UUID
-        event_name: compose normal(50, 20); HashedLineToString(data/variable_words.txt); ToString() -> String
+statement: "{franchise_id}-{event_name}"
 ```
 
 Notice that the events that we are generating are a combination of the franchise_id and the event_name.
@@ -55,14 +53,12 @@ In the case where your keys are unbounded, there are better, idempotent, approac
 For example, the following configuration would result in an unstable Spark application (one that quickly becomes unable to process the data in the time allotted):
 
 ```
+bindings:
+  franchise_id: compose Mod(<<sources:100>>); ToHashedUUID() -> UUID
+  event_name: ToHashedUUID()
 tags:
   phase: main
-  statement:
-    - statement: |
-        {franchise_id}-{event_name}
-      bindings:
-        franchise_id: compose Mod(<<sources:100>>); ToHashedUUID() -> UUID
-        event_name: ToHashedUUID()
+statement: "{franchise_id}-{event_name}"
 ```
 
 In this case the event_name is a UUID derived from the monotonically increasing cycle and it will quickly result in a state that becomes too large and takes too long to persist.
