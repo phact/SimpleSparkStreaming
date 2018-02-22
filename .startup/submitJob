@@ -16,4 +16,4 @@ ps -ef | grep Streaming-0 | grep -v grep|awk '{print $2}' | xargs kill -9
 
 mvn package
 
-dse spark-submit --conf spark.cores.max=6 --class com.datastax.powertools.analytics.SimpleSparkStreaming ./target/SimpleSparkStreaming-0.1.jar "$IP" 9999 5 true true
+dse spark-submit --conf spark.cores.max=30 --class com.datastax.powertools.analytics.SimpleSparkStreaming ./target/SimpleSparkStreaming-0.1.jar "$IP" 9999 5 true true
