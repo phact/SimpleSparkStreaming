@@ -54,6 +54,7 @@ object SimpleSparkStreaming {
     val wordCounts = words.reduceByKey(_ + _)
 
     wordCounts.foreachRDD { (rdd: RDD[(String, Int)], time: org.apache.spark.streaming.Time) =>
+      Log.TRACE()
       val epochTime: Long = System.currentTimeMillis / 1000
 
       val spark = SparkSessionSingleton.getInstance(rdd.sparkContext.getConf)
