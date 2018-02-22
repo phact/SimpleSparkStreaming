@@ -5,5 +5,5 @@ statement:
   - statement: |
       {franchise_id}-{event_name}
     bindings:
-      franchise_id: compose Mod(<<sources:1000>>); ToHashedUUID() -> UUID
-      event_name: HashedLineToString(data/variable_words.txt)
+      franchise_id: compose Mod(<<sources:100>>); ToHashedUUID() -> UUID
+      event_name: compose normal(50, 20); HashedLineToString(data/variable_words.txt); ToString() -> String

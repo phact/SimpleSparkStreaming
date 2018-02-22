@@ -35,12 +35,13 @@ object SimpleSparkStreaming {
     val persist = args(3).toBoolean
     val aggregate = args(4).toBoolean
 
-    System.setProperty("spark.serializer", "spark.KryoSerializer")
+    System.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     System.setProperty("spark.kryo.registrator", "com.datastax.powertools.analytics.MyRegistrator")
 
     val conf = new SparkConf().setAppName("SimpleSparkStreaming")
     conf.set("spark.locality.wait", "0");
     conf.set("spark.kryoserializer.buffer","64k")
+    conf.set("output.concurrent.writes","50")
     conf.set("spark.kryo.registrator", "com.datastax.powertools.analytics.MyRegistrator")
 
 

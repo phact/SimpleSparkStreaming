@@ -19,7 +19,7 @@ fi
 lsof -i:9999| grep java | awk '{print $2}'| xargs kill -9
 
 THREADS=1
-TARGETRATE=100
+TARGETRATE=10000
 PORT=9999
 CYCLES=100000000
 
