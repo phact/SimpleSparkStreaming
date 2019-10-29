@@ -2,8 +2,8 @@
 bindings:
   franchise_id: compose Mod(<<sources:100>>); ToHashedUUID(); ToString() -> String
   event_name: compose normal(50, 20); HashedLineToString(data/variable_words.txt); ToString() -> String
-  date: ToLong()
-  one: compose WeightedStrings('1:1'); ToInt() -> Int
+  date: Identity()
+  one: compose WeightedStrings('1:1'); ToInt()
 tags:
   phase: main
 statements:
