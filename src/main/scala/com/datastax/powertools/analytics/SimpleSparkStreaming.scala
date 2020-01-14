@@ -108,8 +108,8 @@ object SimpleSparkStreaming {
 
 
 //case classes are used to map the data to DSE tables
-case class Event(id: String, count: Long, time: Long)
-case class EventRollup(id: String, count: Long)
+case class Event(word: String, count: Long, time: Long)
+case class EventRollup(word: String, count: Long)
 
 //because we are checkpointing the data into DSEFS, we need to register the case classes with kryo
 class MyRegistrator extends KryoRegistrator {
